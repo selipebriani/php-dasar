@@ -1,25 +1,18 @@
 <?php
-// Koneksi ke database
 $mysqli = new mysqli('localhost', 'root', '', 'tedc');
 
+$result = $mysqli->query("SELECT students.nim, students.nama, study_program.name 
+                         FROM students 
+                         LEFT JOIN study_program ON students.study_program_id = study_program.id
+                         WHERE study_program.id = 11 OR students.study_program_id IS NULL;
+                         ");
 
-
-// Query untuk mengambil data mahasiswa beserta program studi
-$result = $mysqli->query ("SELECT students.nim, students.nama, study_program.name AS program_studi
-          FROM students
-          LEFT JOIN study_program ON students.study_program_id = study_program.id
-          WHERE students.study_program_id = 11 OR students.study_program_id IS NULL");
-
-
-// Array untuk menyimpan data mahasiswa
 $mahasiswa = [];
-
-    while ($row = $result->fetch_assoc()) {
-        array_push($mahasiswa, $row);
-    
-
+while ($row = $result->fetch_assoc()) {
+    array_push($mahasiswa, $row);
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -40,21 +33,30 @@ $mahasiswa = [];
                     <th>NIM</th>
                     <th>Nama</th>
                     <th>Program Studi</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                <?php $no =1; foreach ($mahasiswa as $value) {?>
+                <?php $no = 1; foreach ($mahasiswa as $value) { ?>
                     <tr>
-                            <td><?= $no++; ?></td>
-                            <td><?= $value['nim']; ?></td>
-                            <td><?= $value['nama']; ?></td>
-                            <td><?= $value['program_studi'] == null ? 'NULL' : $value['program_studi'];?></td>
-                        </tr>
-                    <?php } ?>
-               
+                        <td><?= $no++; ?></td>
+                        <td><?= $value['nim']; ?></td>
+                        <td><?= $value['nama']; ?></td>
+                        <td><?= $value['name'] === null ? 'NULL' : $value['name']; ?></td>
+                        <td>
+                            <a href="edit_mahasiswa.php?nim=<?= $value['nim']; ?>" class="btn btn-primary btn-sm"><i class="bi bi-pencil"></i> Edit</a>
+                            <a href="hapus_mahasiswa.php?nim=<?= $value['nim']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                <i class="bi bi-trash"></i> Hapus
+                            </a>
+                        </td>
+                    </tr>
+                <?php } ?>
             </tbody>
         </table>
     </div>
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
