@@ -1,22 +1,20 @@
 <?php
-// hapus_mahasiswa.php
+session_start();
 
 $mysqli = new mysqli('localhost', 'root', '', 'tedc');
 
-if (isset($_GET['nim'])) {
-    $nim = $_GET['nim'];
+$nim = $_GET['nim'];
+$delete = $mysqli->query("DELETE FROM students WHERE nim='$nim'");
 
-    $stmt = $mysqli->prepare("DELETE FROM students WHERE nim = ?");
-    $stmt->bind_param('s', $nim);
-
-    if ($stmt->execute()) {
-        echo "<script>alert('Data berhasil dihapus!'); window.location.href='mahasiswa.php';</script>";
-    } else {
-        echo "<script>alert('Gagal menghapus data: " . $stmt->error . "'); window.location.href='mahasiswa.php';</script>";
-    }
-
-    $stmt->close();
+if ($delete) {
+    $_SESSION['success'] = true;
+    $_SESSION['message'] = 'Data Berhasil Dihapus';
+    header("Location: mahasiswa.php");
+    exit();
 } else {
-    echo "<script>alert('NIM tidak ditemukan!'); window.location.href='mahasiswa.php';</script>";
+    $_SESSION['success'] = false;
+    $_SESSION['message'] = 'Gagal menghapus data: ' . $mysqli->error;
+    header("Location: mahasiswa.php");
+    exit();
 }
 ?>
